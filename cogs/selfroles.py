@@ -274,12 +274,12 @@ class SelfRoles(commands.Cog):
         
         # Add info about how to get roles
         prefix = CONFIG["prefix"]
-        embed.set_footer(text=f"Use {prefix}role <role name> to get a role!")
+        embed.set_footer(text=f"Use {prefix}getrole <role name> to get a role!")
         
         await ctx.send(embed=embed)
     
-    @commands.command(name="role", help="Get or remove a self-assignable role")
-    async def role(self, ctx, *, role_name):
+    @commands.command(name="getrole", aliases=["role"], help="Get or remove a self-assignable role")
+    async def getrole(self, ctx, *, role_name):
         """Give yourself or remove a self-assignable role"""
         # Get the self-roles config
         config = get_self_roles(ctx.guild.id)

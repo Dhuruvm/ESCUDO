@@ -248,16 +248,7 @@ async def on_message(message):
     # This is required to process commands!
     await bot.process_commands(message)
     
-@bot.command(name="ping")
-async def ping(ctx):
-    """Simple ping command to test if the bot is responding"""
-    embed = discord.Embed(
-        title="🏓 Pong!",
-        description=f"Bot Latency: `{round(bot.latency * 1000)}ms`",
-        color=discord.Color.green()
-    )
-    embed.set_footer(text=f"Requested by {ctx.author.name}", icon_url=ctx.author.display_avatar.url)
-    await ctx.send(embed=embed)
+
     
 @bot.command(name="test")
 async def test_command(ctx):
