@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import datetime
 from config import CONFIG
 from utils.helpers import (
     is_mod, is_admin, is_owner, get_guild_config, update_guild_config,
@@ -261,7 +262,7 @@ class JoinToCreate(commands.Cog):
                 description="I don't have permission to rename this voice channel."
             ))
     
-    @commands.command(name="vlock", aliases=["lock"], help="Lock your voice channel")
+    @commands.command(name="vlock", help="Lock your voice channel")
     async def vlock(self, ctx):
         """Lock your voice channel to prevent new users from joining"""
         # Check if the user is in a voice channel
@@ -307,7 +308,7 @@ class JoinToCreate(commands.Cog):
                 description="I don't have permission to set permissions for this voice channel."
             ))
     
-    @commands.command(name="vunlock", aliases=["unlock"], help="Unlock your voice channel")
+    @commands.command(name="vunlock", help="Unlock your voice channel")
     async def vunlock(self, ctx):
         """Unlock your voice channel to allow users to join"""
         # Check if the user is in a voice channel

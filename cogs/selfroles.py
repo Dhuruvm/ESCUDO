@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import re
 from config import CONFIG
 from utils.helpers import (
     is_mod, is_admin, is_owner, get_guild_config, update_guild_config,
@@ -278,7 +279,7 @@ class SelfRoles(commands.Cog):
         
         await ctx.send(embed=embed)
     
-    @commands.command(name="getrole", aliases=["role"], help="Get or remove a self-assignable role")
+    @commands.command(name="getrole", help="Get or remove a self-assignable role")
     async def getrole(self, ctx, *, role_name):
         """Give yourself or remove a self-assignable role"""
         # Get the self-roles config

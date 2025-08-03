@@ -346,9 +346,9 @@ class Others(commands.Cog):
                 description=f"Failed to send the embed: {str(e)}"
             ))
     
-    @commands.command(name="poll", help="Create a poll")
+    @commands.command(name="simplepoll", help="Create a simple poll")
     @commands.check(is_mod)
-    async def poll(self, ctx, *, question):
+    async def simplepoll(self, ctx, *, question):
         """Create a simple yes/no poll"""
         # Create the poll embed
         embed = create_embed(
