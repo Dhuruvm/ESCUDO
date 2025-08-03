@@ -15,6 +15,7 @@ from config import CONFIG
 from datetime import datetime
 import platform
 import psutil
+from keep_alive import keep_alive
 
 # ANSI color codes for beautiful console output
 class Colors:
@@ -288,6 +289,10 @@ def main():
         print(f"\n{Colors.RED}{Colors.BOLD}❌ STARTUP FAILED ❌{Colors.END}")
         print(f"{Colors.GRAY}Please configure your Discord bot token in the environment variables.{Colors.END}")
         return
+    
+    print_status_update("Starting keep-alive server...", "INFO")
+    keep_alive()
+    print_status_update("Keep-alive server started on port 8080", "SUCCESS")
     
     print_status_update("Starting Discord bot connection...", "INFO")
     try:

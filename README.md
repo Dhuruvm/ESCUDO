@@ -63,6 +63,19 @@ The default command prefix is `,` (e.g., `,help`). You can also mention the bot 
 4. Optionally configure owner IDs in the config.py file
 5. Run the bot: `python main.py`
 
+## Keep-Alive System
+
+The bot includes a built-in keep-alive system to prevent it from going offline on Replit:
+
+- **HTTP Server**: Runs on port 8080 with status endpoints
+- **Status Page**: Visit `/` for a visual status page
+- **API Endpoints**: 
+  - `/status` - JSON status information
+  - `/ping` - Simple ping endpoint
+- **Auto-Start**: The keep-alive server starts automatically with the bot
+
+The keep-alive system ensures your bot stays online 24/7 on Replit by maintaining an active HTTP connection.
+
 ## Project Structure
 
 - **main.py**: The main entry point containing the Discord bot implementation
