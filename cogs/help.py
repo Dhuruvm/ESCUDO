@@ -84,13 +84,15 @@ class Help(commands.Cog):
         # Get the category from the emoji
         category = self.emoji_categories[emoji]
         
+        # Create and send the category help embed
+        context = await self.bot.get_context(message)
+        context.author = user  # Set the user as the author for permission checks
+        
         # Get the commands for that category
         commands_list = [cmd for cmd in self.bot.commands 
                         if cmd.cog_name.lower() == category.lower() 
-                        and (not cmd.hidden or is_owner(user))]
+                        and (not cmd.hidden or is_owner(context))]
         
-        # Create and send the category help embed
-        context = await self.bot.get_context(message)
         embed = category_help_embed(context, category, commands_list)
         
         # Try to remove the user's reaction if we have permissions

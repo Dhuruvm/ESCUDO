@@ -275,3 +275,110 @@ async def temp_message(ctx, content, seconds=5):
         await msg.delete()
     except discord.HTTPException:
         pass
+import json
+import os
+from config import CONFIG
+
+def ensure_data_files():
+    """Ensure all required data files exist"""
+    os.makedirs("data", exist_ok=True)
+    
+    files = [
+        "data/server_config.json",
+        "data/warnings.json", 
+        "data/mutes.json",
+        "data/join_to_create.json",
+        "data/self_roles.json",
+        "data/whitelist.json"
+    ]
+    
+    for file_path in files:
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump({}, f)
+
+def is_owner(ctx):
+    """Check if user is bot owner"""
+    return ctx.author.id in CONFIG["owner_ids"]
+
+def is_admin(ctx):
+    """Check if user has admin permissions"""
+    return ctx.author.guild_permissions.administrator or is_owner(ctx)
+
+def is_mod(ctx):
+    """Check if user has mod permissions"""
+    return (ctx.author.guild_permissions.manage_messages or 
+            ctx.author.guild_permissions.manage_guild or 
+            is_admin(ctx))
+
+def get_guild_config(guild_id):
+    """Get guild configuration"""
+    ensure_data_files()
+    try:
+        with open("data/server_config.json", "r") as f:
+            data = json.load(f)
+        return data.get(str(guild_id), {})
+    except:
+        return {}
+
+def update_guild_config(guild_id, config):
+    """Update guild configuration"""
+    ensure_data_files()
+    try:
+        with open("data/server_config.json", "r") as f:
+            data = json.load(f)
+    except:
+        data = {}
+    
+    data[str(guild_id)] = config
+    
+    with open("data/server_config.json", "w") as f:
+        json.dump(data, f, indent=2)
+
+def get_join_to_create_config(guild_id):
+    """Get join to create configuration"""
+    ensure_data_files()
+    try:
+        with open("data/join_to_create.json", "r") as f:
+            data = json.load(f)
+        return data.get(str(guild_id), {})
+    except:
+        return {}
+
+def update_join_to_create_config(guild_id, config):
+    """Update join to create configuration"""
+    ensure_data_files()
+    try:
+        with open("data/join_to_create.json", "r") as f:
+            data = json.load(f)
+    except:
+        data = {}
+    
+    data[str(guild_id)] = config
+    
+    with open("data/join_to_create.json", "w") as f:
+        json.dump(data, f, indent=2)
+
+def add_temp_channel(guild_id, channel_id, user_id):
+    """Add temporary channel to tracking"""
+    config = get_join_to_create_config(guild_id)
+    if "temp_channels" not in config:
+        config["temp_channels"] = {}
+    config["temp_channels"][str(channel_id)] = user_id
+    update_join_to_create_config(guild_id, config)
+
+def remove_temp_channel(guild_id, channel_id):
+    """Remove temporary channel from tracking"""
+    config = get_join_to_create_config(guild_id)
+    if "temp_channels" in config and str(channel_id) in config["temp_channels"]:
+        del config["temp_channels"][str(channel_id)]
+        update_join_to_create_config(guild_id, config)
+
+async def temp_message(ctx, embed, seconds=5):
+    """Send a temporary message that deletes after specified seconds"""
+    msg = await ctx.send(embed=embed)
+    await asyncio.sleep(seconds)
+    try:
+        await msg.delete()
+    except:
+        pass

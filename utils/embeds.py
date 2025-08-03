@@ -164,3 +164,97 @@ def command_help_embed(ctx, command):
     
     embed.set_thumbnail(url=ctx.bot.user.display_avatar.url)
     return embed
+import discord
+from config import CONFIG
+
+def help_menu_embed(ctx, bot):
+    """Create the main help menu embed"""
+    embed = discord.Embed(
+        title="Help Menu",
+        description="Select a category below to view commands",
+        color=CONFIG["embed_color"]
+    )
+    
+    categories = {
+        "🔰": "Antinuke - Protect your server from raids",
+        "🛡️": "No Prefix - Commands without prefix",
+        "🔨": "Moderation - Moderation tools",
+        "🛠️": "Utils - Utility commands",
+        "🔊": "Voice - Voice channel management",
+        "😈": "Other - Fun and misc commands",
+        "➕": "Join to Create - Dynamic voice channels",
+        "👥": "Self Roles - Self-assignable roles"
+    }
+    
+    for emoji, description in categories.items():
+        embed.add_field(name=f"{emoji} {description.split(' - ')[0]}", 
+                       value=description.split(' - ')[1], inline=False)
+    
+    embed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.display_avatar.url)
+    return embed
+
+def category_help_embed(ctx, category, commands_list):
+    """Create a category-specific help embed"""
+    embed = discord.Embed(
+        title=f"{category.title()} Commands",
+        description=f"Commands in the {category} category",
+        color=CONFIG["embed_color"]
+    )
+    
+    if commands_list:
+        command_text = ""
+        for cmd in commands_list:
+            command_text += f"`{CONFIG['prefix']}{cmd.name}` - {cmd.help or 'No description'}\n"
+        embed.add_field(name="Commands", value=command_text, inline=False)
+    else:
+        embed.add_field(name="Commands", value="No commands available", inline=False)
+    
+    embed.set_footer(text=f"Use {CONFIG['prefix']}help <command> for more info")
+    return embed
+
+def command_help_embed(ctx, command):
+    """Create a command-specific help embed"""
+    embed = discord.Embed(
+        title=f"Command: {command.name}",
+        description=command.help or "No description available",
+        color=CONFIG["embed_color"]
+    )
+    
+    if command.aliases:
+        embed.add_field(name="Aliases", value=", ".join(command.aliases), inline=True)
+    
+    embed.add_field(name="Usage", value=f"`{CONFIG['prefix']}{command.name}`", inline=True)
+    embed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.display_avatar.url)
+    return embed
+
+def success_embed(title, description):
+    """Create a success embed"""
+    return discord.Embed(
+        title=title,
+        description=description,
+        color=CONFIG["success_color"]
+    )
+
+def error_embed(title, description):
+    """Create an error embed"""
+    return discord.Embed(
+        title=title,
+        description=description,
+        color=CONFIG["error_color"]
+    )
+
+def warning_embed(title, description):
+    """Create a warning embed"""
+    return discord.Embed(
+        title=title,
+        description=description,
+        color=CONFIG["warning_color"]
+    )
+
+def info_embed(title, description):
+    """Create an info embed"""
+    return discord.Embed(
+        title=title,
+        description=description,
+        color=CONFIG["info_color"]
+    )
