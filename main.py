@@ -291,7 +291,7 @@ async def on_guild_remove(guild):
     print_status_update(f"Left guild: {guild.name} ({guild.id})", "WARNING")
 
 def main():
-    token = os.getenv("DISCORD_TOKEN")
+    token = os.getenv("DISCORD_TOKEN","MTQwMTQ4NjY4ODY0NzM4NTEwOQ.GPlN28.4SxcLUXT1fnS9oRKRyU_lN_N1E6r8gbOFfHvR0")
     if not token:
         print_status_update("Discord token not found! Please set the DISCORD_TOKEN environment variable.", "ERROR")
         print(f"\n{Colors.RED}{Colors.BOLD}❌ STARTUP FAILED ❌{Colors.END}")
