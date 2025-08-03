@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 Main entry point for the ESCUDO Discord bot.
@@ -57,27 +56,27 @@ def print_system_info():
     print(f"\n{Colors.PURPLE}{Colors.BOLD}{'='*80}")
     print(f"                           SYSTEM INFORMATION")
     print(f"{'='*80}{Colors.END}")
-    
+
     # Bot Information Section
     print(f"\n{Colors.CYAN}{Colors.BOLD}🤖 BOT CONFIGURATION{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}Bot Name:{Colors.END} {Colors.GREEN}ESCUDO Protection Bot{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}Prefix:{Colors.END} {Colors.YELLOW}{CONFIG['prefix']}{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}Version:{Colors.END} {Colors.CYAN}v2.0.0{Colors.END}")
     print(f"{Colors.GRAY}└─{Colors.END} {Colors.WHITE}Status:{Colors.END} {Colors.GREEN}Initializing...{Colors.END}")
-    
+
     # System Information Section
     print(f"\n{Colors.MAGENTA}{Colors.BOLD}💻 SYSTEM DETAILS{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}Platform:{Colors.END} {Colors.CYAN}{platform.system()} {platform.release()}{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}Architecture:{Colors.END} {Colors.CYAN}{platform.machine()}{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}Python Version:{Colors.END} {Colors.YELLOW}{platform.python_version()}{Colors.END}")
     print(f"{Colors.GRAY}├─{Colors.END} {Colors.WHITE}CPU Cores:{Colors.END} {Colors.GREEN}{psutil.cpu_count()}{Colors.END}")
-    
+
     # Memory usage
     memory = psutil.virtual_memory()
     memory_used = round(memory.used / 1024 / 1024 / 1024, 2)
     memory_total = round(memory.total / 1024 / 1024 / 1024, 2)
     print(f"{Colors.GRAY}└─{Colors.END} {Colors.WHITE}Memory:{Colors.END} {Colors.GREEN}{memory_used}GB{Colors.END}/{Colors.CYAN}{memory_total}GB{Colors.END}")
-    
+
     # Features Section
     print(f"\n{Colors.BLUE}{Colors.BOLD}✨ FEATURES OVERVIEW{Colors.END}")
     features = [
@@ -89,7 +88,7 @@ def print_system_info():
         ("👥 Self Roles", "User role management"),
         ("😈 Fun Commands", "Entertainment features")
     ]
-    
+
     for i, (feature, description) in enumerate(features):
         prefix = "├─" if i < len(features) - 1 else "└─"
         print(f"{Colors.GRAY}{prefix}{Colors.END} {Colors.PURPLE}{feature}{Colors.END} - {Colors.WHITE}{description}{Colors.END}")
@@ -100,7 +99,7 @@ def print_startup_progress(step, total, message):
     bar_length = 40
     filled_length = int(bar_length * step // total)
     bar = '█' * filled_length + '░' * (bar_length - filled_length)
-    
+
     print(f"\r{Colors.PURPLE}[{bar}] {percentage:3d}% {Colors.CYAN}{message}{Colors.END}", end='', flush=True)
     if step == total:
         print()  # New line after completion
@@ -108,7 +107,7 @@ def print_startup_progress(step, total, message):
 def print_status_update(message, status="INFO"):
     """Print formatted status messages"""
     timestamp = datetime.now().strftime("%H:%M:%S")
-    
+
     if status == "SUCCESS":
         color = Colors.GREEN
         icon = "✅"
@@ -121,7 +120,7 @@ def print_status_update(message, status="INFO"):
     else:
         color = Colors.CYAN
         icon = "ℹ️"
-    
+
     print(f"{Colors.GRAY}[{timestamp}]{Colors.END} {color}{icon} {message}{Colors.END}")
 
 # Configure logging with custom formatter
@@ -134,10 +133,10 @@ class ColoredFormatter(logging.Formatter):
             'ERROR': Colors.RED,
             'CRITICAL': Colors.RED + Colors.BOLD
         }
-        
+
         color = log_colors.get(record.levelname, Colors.WHITE)
         timestamp = datetime.now().strftime("%H:%M:%S")
-        
+
         return f"{Colors.GRAY}[{timestamp}]{Colors.END} {color}[{record.levelname}]{Colors.END} {Colors.WHITE}{record.getMessage()}{Colors.END}"
 
 # Configure logging
@@ -169,18 +168,19 @@ bot.dev_command_count = 0
 async def load_cogs():
     cogs = [
         'cogs.antinuke',
-        'cogs.moderation', 
+        'cogs.moderation',
         'cogs.utils',
         'cogs.voice',
         'cogs.others',
         'cogs.jointoCreate',
         'cogs.selfroles',
+        'cogs.shadowclone',
         'cogs.help'
     ]
-    
+
     total_cogs = len(cogs)
     loaded = 0
-    
+
     for i, cog in enumerate(cogs):
         try:
             print_startup_progress(i, total_cogs, f"Loading {cog.split('.')[-1]}...")
@@ -189,7 +189,7 @@ async def load_cogs():
             await asyncio.sleep(0.1)  # Small delay for visual effect
         except Exception as e:
             print_status_update(f"Failed to load {cog}: {e}", "ERROR")
-    
+
     print_startup_progress(total_cogs, total_cogs, f"Loaded {loaded}/{total_cogs} modules successfully!")
     print()
 
@@ -197,19 +197,19 @@ async def load_cogs():
 async def on_ready():
     print(f"\n{Colors.GREEN}{Colors.BOLD}🎉 CONNECTION ESTABLISHED 🎉{Colors.END}")
     print(f"{Colors.PURPLE}{'─' * 50}{Colors.END}")
-    
+
     # Bot status information
     print(f"{Colors.WHITE}Bot Username:{Colors.END} {Colors.PURPLE}{bot.user.name}{Colors.END}")
     print(f"{Colors.WHITE}Bot ID:{Colors.END} {Colors.CYAN}{bot.user.id}{Colors.END}")
     print(f"{Colors.WHITE}Guild Count:{Colors.END} {Colors.GREEN}{len(bot.guilds)}{Colors.END}")
     print(f"{Colors.WHITE}User Count:{Colors.END} {Colors.GREEN}{sum(guild.member_count for guild in bot.guilds)}{Colors.END}")
     print(f"{Colors.WHITE}Commands Loaded:{Colors.END} {Colors.YELLOW}{bot.command_count}{Colors.END}")
-    
+
     await bot.change_presence(activity=discord.Activity(
         type=discord.ActivityType.watching, 
         name=f"{CONFIG['prefix']}help | ESCUDO Protection"
     ))
-    
+
     print(f"\n{Colors.PURPLE}{Colors.BOLD}🛡️  ESCUDO PROTECTION BOT IS NOW ONLINE!  🛡️{Colors.END}")
     print(f"{Colors.GRAY}Ready to protect and moderate your Discord servers!{Colors.END}")
     print(f"{Colors.PURPLE}{'═' * 80}{Colors.END}\n")
@@ -218,12 +218,12 @@ async def on_ready():
 async def setup_hook():
     print_banner()
     print_system_info()
-    
+
     print(f"\n{Colors.PURPLE}{Colors.BOLD}🚀 INITIALIZATION SEQUENCE{Colors.END}")
     print(f"{Colors.PURPLE}{'─' * 50}{Colors.END}")
-    
+
     await load_cogs()
-    
+
     # Count commands
     for command in bot.commands:
         bot.command_count += 1
@@ -231,26 +231,26 @@ async def setup_hook():
             bot.np_command_count += 1
         else:
             bot.dev_command_count += 1
-    
+
     print_status_update(f"Command statistics calculated", "SUCCESS")
     print_status_update(f"Total Commands: {bot.command_count}", "INFO")
     print_status_update(f"Public Commands: {bot.np_command_count}", "INFO")
     print_status_update(f"Developer Commands: {bot.dev_command_count}", "INFO")
-            
+
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
-    
+
     # Add test response for any message starting with "test"
     if message.content.lower().startswith("test"):
         await message.channel.send("Bot is responding to 'test'!")
-    
+
     # This is required to process commands!
     await bot.process_commands(message)
-    
 
-    
+
+
 @bot.command(name="test")
 async def test_command(ctx):
     """Test command to check if the bot is working"""
@@ -263,12 +263,12 @@ async def test_command(ctx):
     embed.add_field(name="Prefix", value=f"`{CONFIG['prefix']}`", inline=True)
     embed.set_footer(text=f"Requested by {ctx.author.name}", icon_url=ctx.author.display_avatar.url)
     await ctx.send(embed=embed)
-    
+
 @bot.command(name="hello")
 async def hello(ctx):
     """Says hello to the user"""
     await ctx.send(f"👋 Hello {ctx.author.mention}! How can I help you today?")
-    
+
 @bot.event
 async def on_command_error(ctx, error):
     print_status_update(f"Command error in {ctx.command}: {error}", "ERROR")
@@ -289,11 +289,11 @@ def main():
         print(f"\n{Colors.RED}{Colors.BOLD}❌ STARTUP FAILED ❌{Colors.END}")
         print(f"{Colors.GRAY}Please configure your Discord bot token in the environment variables.{Colors.END}")
         return
-    
+
     print_status_update("Starting keep-alive server...", "INFO")
     keep_alive()
     print_status_update("Keep-alive server started on port 8080", "SUCCESS")
-    
+
     print_status_update("Starting Discord bot connection...", "INFO")
     try:
         bot.run(token)
@@ -306,7 +306,7 @@ class FakeApp:
     def __call__(self, environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
         return [b'ESCUDO Discord Bot is running']
-        
+
     def run(self, host="0.0.0.0", port=5000, debug=True):
         """
         Mock run method to make the FakeApp compatible with Flask's interface.

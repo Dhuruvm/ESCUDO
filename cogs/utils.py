@@ -610,6 +610,7 @@ class Utils(commands.Cog):
                 'cogs.others',
                 'cogs.jointoCreate',
                 'cogs.selfroles',
+                'cogs.shadowclone',
                 'cogs.help'
             ]
             
