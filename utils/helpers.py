@@ -5,6 +5,31 @@ from datetime import datetime
 import asyncio
 from config import CONFIG
 
+def get_self_roles(guild_id):
+    """Get self-assignable roles for a guild"""
+    try:
+        with open(os.path.join("data", "self_roles.json"), 'r') as f:
+            data = json.load(f)
+            return data.get("guilds", {}).get(str(guild_id), {})
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def update_self_roles(guild_id, self_roles):
+    """Update self-assignable roles for a guild"""
+    try:
+        with open(os.path.join("data", "self_roles.json"), 'r') as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = {"guilds": {}}
+
+    if "guilds" not in data:
+        data["guilds"] = {}
+
+    data["guilds"][str(guild_id)] = self_roles
+
+    with open(os.path.join("data", "self_roles.json"), 'w') as f:
+        json.dump(data, f, indent=4)
+
 # File path for JSON storage
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -24,7 +49,7 @@ def ensure_data_files():
         JOIN_TO_CREATE_FILE: {"channels": {}},
         SELF_ROLES_FILE: {"guilds": {}}
     }
-    
+
     for file_path, default_data in files.items():
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
@@ -50,7 +75,7 @@ def save_json(file_path, data):
 def get_guild_config(guild_id):
     data = load_json(SERVER_CONFIG_FILE)
     guild_id = str(guild_id)
-    
+
     if guild_id not in data["guilds"]:
         data["guilds"][guild_id] = {
             "prefix": CONFIG["prefix"],
@@ -70,7 +95,7 @@ def get_guild_config(guild_id):
             }
         }
         save_json(SERVER_CONFIG_FILE, data)
-    
+
     return data["guilds"][guild_id]
 
 def update_guild_config(guild_id, config_data):
@@ -83,19 +108,19 @@ def update_guild_config(guild_id, config_data):
 def is_whitelisted(guild_id, user_id):
     data = load_json(WHITELIST_FILE)
     guild_id, user_id = str(guild_id), str(user_id)
-    
+
     if guild_id not in data["guilds"]:
         return False
-    
+
     return user_id in data["guilds"][guild_id]
 
 def add_to_whitelist(guild_id, user_id):
     data = load_json(WHITELIST_FILE)
     guild_id, user_id = str(guild_id), str(user_id)
-    
+
     if guild_id not in data["guilds"]:
         data["guilds"][guild_id] = []
-    
+
     if user_id not in data["guilds"][guild_id]:
         data["guilds"][guild_id].append(user_id)
         save_json(WHITELIST_FILE, data)
@@ -105,10 +130,10 @@ def add_to_whitelist(guild_id, user_id):
 def remove_from_whitelist(guild_id, user_id):
     data = load_json(WHITELIST_FILE)
     guild_id, user_id = str(guild_id), str(user_id)
-    
+
     if guild_id not in data["guilds"]:
         return False
-    
+
     if user_id in data["guilds"][guild_id]:
         data["guilds"][guild_id].remove(user_id)
         save_json(WHITELIST_FILE, data)
@@ -118,7 +143,7 @@ def remove_from_whitelist(guild_id, user_id):
 def reset_whitelist(guild_id):
     data = load_json(WHITELIST_FILE)
     guild_id = str(guild_id)
-    
+
     if guild_id in data["guilds"]:
         data["guilds"][guild_id] = []
         save_json(WHITELIST_FILE, data)
@@ -128,17 +153,17 @@ def reset_whitelist(guild_id):
 def get_whitelisted_users(guild_id):
     data = load_json(WHITELIST_FILE)
     guild_id = str(guild_id)
-    
+
     if guild_id not in data["guilds"]:
         return []
-    
+
     return data["guilds"][guild_id]
 
 # Join to Create helpers
 def get_join_to_create_config(guild_id):
     data = load_json(JOIN_TO_CREATE_FILE)
     guild_id = str(guild_id)
-    
+
     if guild_id not in data["channels"]:
         data["channels"][guild_id] = {
             "setup_channel": None,
@@ -146,7 +171,7 @@ def get_join_to_create_config(guild_id):
             "category": None
         }
         save_json(JOIN_TO_CREATE_FILE, data)
-    
+
     return data["channels"][guild_id]
 
 def update_join_to_create_config(guild_id, config_data):
@@ -168,34 +193,16 @@ def remove_temp_channel(guild_id, channel_id):
         update_join_to_create_config(guild_id, config)
 
 # Self Roles helpers
-def get_self_roles(guild_id):
-    data = load_json(SELF_ROLES_FILE)
-    guild_id = str(guild_id)
-    
-    if guild_id not in data["guilds"]:
-        data["guilds"][guild_id] = {
-            "messages": {}
-        }
-        save_json(SELF_ROLES_FILE, data)
-    
-    return data["guilds"][guild_id]
-
-def update_self_roles(guild_id, config_data):
-    data = load_json(SELF_ROLES_FILE)
-    guild_id = str(guild_id)
-    data["guilds"][guild_id] = config_data
-    save_json(SELF_ROLES_FILE, data)
-
 # Snipe feature helpers
 def add_snipe(channel_id, message):
     channel_id = str(channel_id)
     if channel_id not in SNIPE_CACHE:
         SNIPE_CACHE[channel_id] = []
-    
+
     # Keep only the last 10 deleted messages
     if len(SNIPE_CACHE[channel_id]) >= 10:
         SNIPE_CACHE[channel_id].pop(0)
-    
+
     SNIPE_CACHE[channel_id].append({
         'content': message.content,
         'author': str(message.author),
@@ -214,53 +221,53 @@ def get_snipe(channel_id):
 def is_mod(ctx):
     if ctx.author.guild_permissions.administrator:
         return True
-    
+
     config = get_guild_config(ctx.guild.id)
     mod_roles = config.get("mod_roles", [])
-    
+
     for role in ctx.author.roles:
         if str(role.id) in mod_roles:
             return True
-    
+
     return False
 
 def is_admin(ctx):
     if ctx.author.guild_permissions.administrator:
         return True
-    
+
     config = get_guild_config(ctx.guild.id)
     admin_roles = config.get("admin_roles", [])
-    
+
     for role in ctx.author.roles:
         if str(role.id) in admin_roles:
             return True
-    
+
     return False
 
 def is_owner(ctx):
     if ctx.author.id in CONFIG["owner_ids"]:
         return True
-    
+
     guild_id = str(ctx.guild.id)
     if guild_id in CONFIG["extra_owners"] and ctx.author.id in CONFIG["extra_owners"][guild_id]:
         return True
-    
+
     return False
 
 # Antinuke helpers
 def is_nightmode_active(guild_id):
     config = get_guild_config(guild_id)
     nightmode = config.get("nightmode", {})
-    
+
     if not nightmode.get("enabled", False):
         return False
-    
+
     now = datetime.now()
     current_hour = now.hour
-    
+
     start_hour = nightmode.get("start_hour", 22)
     end_hour = nightmode.get("end_hour", 6)
-    
+
     if start_hour < end_hour:
         return start_hour <= current_hour < end_hour
     else:
@@ -282,7 +289,7 @@ from config import CONFIG
 def ensure_data_files():
     """Ensure all required data files exist"""
     os.makedirs("data", exist_ok=True)
-    
+
     files = [
         "data/server_config.json",
         "data/warnings.json", 
@@ -291,7 +298,7 @@ def ensure_data_files():
         "data/self_roles.json",
         "data/whitelist.json"
     ]
-    
+
     for file_path in files:
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
@@ -329,9 +336,9 @@ def update_guild_config(guild_id, config):
             data = json.load(f)
     except:
         data = {}
-    
+
     data[str(guild_id)] = config
-    
+
     with open("data/server_config.json", "w") as f:
         json.dump(data, f, indent=2)
 
@@ -353,9 +360,9 @@ def update_join_to_create_config(guild_id, config):
             data = json.load(f)
     except:
         data = {}
-    
+
     data[str(guild_id)] = config
-    
+
     with open("data/join_to_create.json", "w") as f:
         json.dump(data, f, indent=2)
 

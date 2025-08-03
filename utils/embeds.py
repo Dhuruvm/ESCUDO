@@ -258,3 +258,117 @@ def info_embed(title, description):
         description=description,
         color=CONFIG["info_color"]
     )
+import discord
+from config import CONFIG
+
+def create_embed(title=None, description=None, color=None):
+    """Create a basic embed with default styling"""
+    if color is None:
+        color = CONFIG.get("embed_color", discord.Color.blue())
+    
+    embed = discord.Embed(title=title, description=description, color=color)
+    return embed
+
+def success_embed(title, description=None):
+    """Create a success embed with green color"""
+    embed = discord.Embed(title=title, description=description, color=discord.Color.green())
+    return embed
+
+def error_embed(title, description=None):
+    """Create an error embed with red color"""
+    embed = discord.Embed(title=title, description=description, color=discord.Color.red())
+    return embed
+
+def info_embed(title, description=None):
+    """Create an info embed with blue color"""
+    embed = discord.Embed(title=title, description=description, color=discord.Color.blue())
+    return embed
+
+def warning_embed(title, description=None):
+    """Create a warning embed with yellow color"""
+    embed = discord.Embed(title=title, description=description, color=discord.Color.yellow())
+    return embed
+
+def help_menu_embed(ctx, bot):
+    """Create the main help menu embed"""
+    embed = create_embed(
+        title="Help Menu",
+        description="Select a category by clicking the reactions below:",
+        color=CONFIG.get("embed_color", discord.Color.blue())
+    )
+    
+    embed.add_field(
+        name="Categories",
+        value="🔰 **Antinuke** - Server protection\n"
+              "🔨 **Moderation** - Moderation tools\n" 
+              "🛠️ **Utils** - Utility commands\n"
+              "🔊 **Voice** - Voice management\n"
+              "😈 **Other** - Fun commands\n"
+              "➕ **JoinToCreate** - Dynamic voice channels\n"
+              "👥 **SelfRoles** - Self-assignable roles\n"
+              "🔮 **ShadowClone** - Personal bot clones",
+        inline=False
+    )
+    
+    embed.set_footer(text=f"Use {CONFIG['prefix']}help <command> for specific command info")
+    return embed
+
+def category_help_embed(ctx, category, commands_list):
+    """Create a category help embed"""
+    embed = create_embed(
+        title=f"{category.title()} Commands",
+        description=f"Commands in the {category} category:",
+        color=CONFIG.get("embed_color", discord.Color.blue())
+    )
+    
+    if commands_list:
+        commands_text = []
+        for cmd in commands_list:
+            cmd_help = cmd.help or "No description available"
+            commands_text.append(f"`{CONFIG['prefix']}{cmd.name}` - {cmd_help}")
+        
+        embed.add_field(
+            name="Available Commands",
+            value="\n".join(commands_text[:10]),  # Limit to 10 commands per page
+            inline=False
+        )
+        
+        if len(commands_list) > 10:
+            embed.set_footer(text=f"Showing 10 of {len(commands_list)} commands")
+    else:
+        embed.add_field(
+            name="No Commands",
+            value="No commands available in this category.",
+            inline=False
+        )
+    
+    return embed
+
+def command_help_embed(ctx, command):
+    """Create a specific command help embed"""
+    embed = create_embed(
+        title=f"Command: {command.name}",
+        description=command.help or "No description available",
+        color=CONFIG.get("embed_color", discord.Color.blue())
+    )
+    
+    # Add usage information
+    usage = f"{CONFIG['prefix']}{command.name}"
+    if command.usage:
+        usage += f" {command.usage}"
+    
+    embed.add_field(name="Usage", value=f"`{usage}`", inline=False)
+    
+    # Add aliases if any
+    if command.aliases:
+        embed.add_field(
+            name="Aliases", 
+            value=", ".join([f"`{alias}`" for alias in command.aliases]), 
+            inline=False
+        )
+    
+    # Add category
+    if command.cog_name:
+        embed.add_field(name="Category", value=command.cog_name, inline=True)
+    
+    return embed

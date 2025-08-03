@@ -4,7 +4,8 @@ import os
 DEFAULT_OWNER_ID = 1234567890  # Replace this with your Discord user ID
 
 CONFIG = {
-    'prefix': ',',
+    "prefix": ",",
+    "embed_color": 0x7289DA,  # Discord blurple color
     'owner_ids': [int(id) for id in os.getenv("OWNER_IDS", str(DEFAULT_OWNER_ID)).split(",") if id],
     'extra_owners': {},
     'antinuke': {

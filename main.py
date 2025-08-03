@@ -249,6 +249,32 @@ async def on_message(message):
     # This is required to process commands!
     await bot.process_commands(message)
 
+# Ensure all data files exist
+def ensure_data_files():
+    """Ensure all required data files exist"""
+    import os
+    import json
+    
+    data_dir = "data"
+    os.makedirs(data_dir, exist_ok=True)
+    
+    # Default data structures
+    default_files = {
+        "shadowclones.json": {"clones": {}},
+        "self_roles.json": {"guilds": {}},
+        "server_config.json": {"guilds": {}},
+        "warnings.json": {"guilds": {}},
+        "mutes.json": {"guilds": {}},
+        "join_to_create.json": {"guilds": {}},
+        "whitelist.json": {"guilds": {}}
+    }
+    
+    for filename, default_data in default_files.items():
+        filepath = os.path.join(data_dir, filename)
+        if not os.path.exists(filepath):
+            with open(filepath, 'w') as f:
+                json.dump(default_data, f, indent=4)
+
 
 
 @bot.command(name="test")
@@ -289,6 +315,10 @@ def main():
         print(f"\n{Colors.RED}{Colors.BOLD}❌ STARTUP FAILED ❌{Colors.END}")
         print(f"{Colors.GRAY}Please configure your Discord bot token in the environment variables.{Colors.END}")
         return
+
+    print_status_update("Ensuring data files exist...", "INFO")
+    ensure_data_files()
+    print_status_update("Data files verified", "SUCCESS")
 
     print_status_update("Starting keep-alive server...", "INFO")
     keep_alive()
