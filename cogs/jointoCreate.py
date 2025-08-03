@@ -397,8 +397,8 @@ class JoinToCreate(commands.Cog):
             description=f"✅ You are now the owner of {voice_channel.mention}."
         ))
     
-    @commands.command(name="voicekick", help="Kick a user from your voice channel")
-    async def voicekick(self, ctx, member: discord.Member, *, reason=None):
+    @commands.command(name="channelkick", aliases=["ckick"], help="Kick a user from your voice channel")
+    async def channelkick(self, ctx, member: discord.Member, *, reason=None):
         """Kick a user from your voice channel"""
         # Check if the user is in a voice channel
         if not ctx.author.voice or not ctx.author.voice.channel:
