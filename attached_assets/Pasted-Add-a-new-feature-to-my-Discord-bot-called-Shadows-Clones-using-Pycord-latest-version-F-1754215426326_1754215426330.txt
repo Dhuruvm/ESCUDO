@@ -1,0 +1,70 @@
+Add a new feature to my Discord bot called "Shadows Clones" using Pycord (latest version).
+
+### 🔮 Feature Description:
+Allow users to create their own **customized webhook bots** (clones of ESCUDO) in any channel.
+
+Each clone:
+- Uses a **user-defined prefix** (e.g., `my!`)
+- Has a custom **name** and **avatar** (set via command)
+- **Replicates all command responses** of the main bot
+- Sends messages using the webhook with the user-defined name and avatar
+- Appears like a mini version of ESCUDO (user’s personal bot clone)
+
+---
+
+### 🔧 Functional Requirements:
+
+1. **Command:** `/shadowclone create`
+   - Input: `name`, `avatar_url`, `prefix`
+   - Creates a **webhook** in the current channel
+   - Stores `webhook_id`, `token`, `name`, `prefix`, `avatar_url`, and `user_id` in a database (JSON/SQLite)
+   - Responds with a success embed showing the new clone details
+
+2. **Command:** `/shadowclone delete`
+   - Deletes the stored webhook and removes DB entry
+
+3. **Command:** `/shadowclone update`
+   - Allows updating name/avatar/prefix
+
+4. **Listener:** `on_message`
+   - Intercepts any message in channels that match a stored clone
+   - Checks if the message starts with the stored `prefix`
+   - Parses the command and arguments
+   - Runs the main bot logic or replicates ESCUDO commands
+   - Responds using the webhook with the clone’s `name` and `avatar_url`
+
+---
+
+### 🧱 System Requirements:
+- Use modular files:
+  - `shadowclone.py` (Cog)
+  - `webhook_db.py` (DB interface)
+  - `command_router.py` (replicates bot logic for clones)
+
+- Clone bot should work without slash commands (pure prefix-based)
+
+- Add command usage logs to ESCUDO (optional)
+
+---
+
+### 🖼️ UI & Embeds:
+- Use aesthetic Discord-style embeds for clone creation, updates, etc.
+- Include fields like Clone Name, Prefix, Avatar URL, and Webhook Channel
+
+---
+
+### 🛡️ Security & Limits:
+- One ShadowClone per user per channel
+- Only clone owner can delete or edit
+- Validate avatar URL and prefix length
+- Auto-disable if webhook is deleted
+
+---
+
+### 📦 Output Expected:
+- Full Cog with `/shadowclone create`, `/update`, `/delete`
+- Message listener to intercept and reply via webhook
+- Modular DB handler
+- Utility to replicate command responses via clone
+
+Build the entire "Shadows Clones" system cleanly and integrate into my ESCUDO bot.
